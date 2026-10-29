@@ -1,14 +1,21 @@
+import os
 import secrets
 
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.middleware.sessions import SessionMiddleware
 
+AUTH_USERNAME = os.environ["AUTH_USERNAME"]
+AUTH_PASSWORD = os.environ["AUTH_PASSWORD"]
+
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key="secret")
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.environ["SESSION_SECRET"],
+)
 
 LOGIN = (
-    '<form method="post" action="/auth/login">'
+    '<form method="post" action="login">'
     '<input name="username"><input name="password" type="password">'
     "<button>OK</button></form>"
 )
@@ -30,14 +37,14 @@ def login_page():
 
 @app.post("/auth/login")
 def login(request: Request, username: str = Form(), password: str = Form()):
-    if username != "admin" or password != "admin":
+    if username != AUTH_USERNAME or password != AUTH_PASSWORD:
         return HTMLResponse(LOGIN + "<p>fail</p>", status_code=401)
     request.session["ok"] = True
-    return RedirectResponse("/auth/code", status_code=303)
+    return RedirectResponse("code", status_code=303)
 
 
 @app.get("/auth/code")
 def auth_code(request: Request):
     if not request.session.pop("ok", None):
-        return RedirectResponse("/auth/", status_code=303)
+        return RedirectResponse("../", status_code=303)
     return HTMLResponse(f"<h1>{code()}</h1>")
