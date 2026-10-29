@@ -50,7 +50,7 @@ def login(request: Request, username: str = Form(), password: str = Form()):
 @app.get("/auth/code")
 def auth_code(request: Request):
     if not request.session.pop("ok", None):
-        return RedirectResponse("../", status_code=303)
+        return RedirectResponse(".", status_code=303)
     return templates.TemplateResponse(
         request, "code.html", {"code": code()}
     )
