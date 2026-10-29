@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    container_name: recruto-fastapi
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:${PORT}:${PORT}"
